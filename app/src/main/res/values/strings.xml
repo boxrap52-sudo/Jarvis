@@ -1,4 +1,40 @@
 <resources>
     <string name="app_name">JARVIS</string>
     <string name="hologram_description">JARVIS hologram</string>
+    <string name="system_online">SYSTEM ONLINE</string>
+    <string name="title_jarvis">J.A.R.V.I.S</string>
+    <string name="welcome_sahil">Welcome, Sahil</string>
+    <string name="credit_developer">Developed by SAHIGMA</string>
+
+    <string name="btn_mic">Microphone</string>
+    <string name="btn_camera">Camera vision</string>
+    <string name="btn_command">Command center</string>
+    <string name="btn_lang">Change language</string>
+    <string name="lang_english">ENGLISH</string>
+    <string name="lang_hindi">हिन्दी</string>
+
+    <string name="status_standby">STANDING BY</string>
+    <string name="status_listening">● MIC ACTIVE · LISTENING</string>
+    <string name="status_processing">PROCESSING…</string>
+    <string name="status_speaking">SPEAKING…</string>
+    <string name="status_camera_soon">Camera vision arrives in Stage 5</string>
+    <string name="status_command_soon">Command center arrives in Stage 6</string>
+    <string name="status_lang_english">Language: English</string>
+    <string name="status_lang_hindi">Language: Hindi / Hinglish</string>
+
+    <string name="you_said">You: %1$s</string>
+    <string name="jarvis_said">JARVIS: %1$s</string>
+    <string name="reply_placeholder_en">You said: %1$s. My AI brain connects in the next stage.</string>
+    <string name="reply_placeholder_hi">आपने कहा: %1$s। मेरा AI दिमाग अगले स्टेज में जुड़ेगा।</string>
+
+    <string name="err_mic_denied">Microphone permission denied. Allow it in Settings > Apps > JARVIS > Permissions.</string>
+    <string name="err_no_recognizer">Speech recognition is not available on this phone.</string>
+    <string name="err_no_match">Did not catch that. Tap the mic and try again.</string>
+    <string name="err_network">Network problem. Speech recognition may need internet.</string>
+    <string name="err_busy">Recognizer is busy. Try again in a moment.</string>
+    <string name="err_audio">Audio recording problem. Check your microphone.</string>
+    <string name="err_lang">This language is not available for speech recognition.</string>
+    <string name="err_generic">Speech recognition error. Please try again.</string>
+    <string name="err_tts_unavailable">Voice output is not available on this phone.</string>
+    <string name="err_tts_lang">Voice for this language is not installed. Showing text only.</string>
 </resources>

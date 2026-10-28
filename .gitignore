@@ -1,6 +1,6 @@
+build/
+.gradle/
 local.properties
-.gradle
-build
-*.bak
-*.backup
-*.backup.xml
+*.apk
+*.iml
+.idea/

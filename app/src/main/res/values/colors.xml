@@ -1,3 +1,7 @@
 <resources>
     <color name="jarvis_background">#02060F</color>
+    <color name="jarvis_cyan">#00E5FF</color>
+    <color name="jarvis_cyan_dim">#6600E5FF</color>
+    <color name="jarvis_text_dim">#99B8E8F5</color>
+    <color name="jarvis_panel">#1400E5FF</color>
 </resources>
