@@ -1,16 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/jarvis_background">
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#050B14">
 
-    <!-- Your hologram image: app/src/main/res/drawable/hologram.png -->
-    <ImageView
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:contentDescription="@string/hologram_description"
-        android:scaleType="fitCenter"
-        android:src="@drawable/hologram" />
+        android:layout_height="wrap_content"
+        android:text="J.A.R.V.I.S"
+        android:textColor="#35E8FF"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:letterSpacing="0.18"
+        android:paddingTop="12dp" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SYSTEM ONLINE • READY"
+        android:textColor="#76BFD0"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:padding="8dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp">
+
+        <ImageView
+            android:id="@+id/hologramImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="JARVIS holographic robot"
+            android:scaleType="fitCenter"
+            android:src="@drawable/hologram" />
+
+        <TextView
+            android:id="@+id/assistantMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:gravity="center"
+            android:padding="12dp"
+            android:background="#CC071522"
+            android:text="Hello Sahil. JARVIS is ready."
+            android:textColor="#B8F7FF"
+            android:textSize="15sp" />
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="COMMAND CENTER"
+        android:textColor="#35E8FF"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:padding="6dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="3">
+
+        <Button
+            android:id="@+id/voiceButton"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="VOICE"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#075A75" />
+
+        <Button
+            android:id="@+id/cameraButton"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="CAMERA"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#075A75" />
+
+        <Button
+            android:id="@+id/commandButton"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:text="COMMAND"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#075A75" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DEVELOPED BY SAHIL • SAHIGMA"
+        android:textColor="#5A9DAE"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp" />
+
+</LinearLayout>
