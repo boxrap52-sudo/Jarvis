@@ -5,6 +5,15 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.app.AlertDialog
+import android.text.InputType
+import android.widget.EditText
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+import java.io.OutputStreamWriter
+import java.util.concurrent.Executors
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -30,6 +39,7 @@ class MainActivity : Activity() {
         private const val REQ_MIC = 101
         private const val PREFS = "jarvis_prefs"
         private const val KEY_LANG = "lang"
+        private const val KEY_GEMINI = "gemini_api_key"
         private const val LANG_EN = "en-IN"
         private const val LANG_HI = "hi-IN"
         private const val COLOR_CYAN = 0xFF00E5FF.toInt()
@@ -37,6 +47,7 @@ class MainActivity : Activity() {
     }
 
     private val handler = Handler(Looper.getMainLooper())
+    private val aiExecutor = Executors.newSingleThreadExecutor()
     private val animators = mutableListOf<ObjectAnimator>()
     private var isRunning = false
 
@@ -74,7 +85,7 @@ class MainActivity : Activity() {
         btnMic.setOnClickListener { onMicClicked() }
         btnLang.setOnClickListener { toggleLanguage() }
         findViewById<View>(R.id.btn_camera).setOnClickListener { flash(getString(R.string.status_camera_soon)) }
-        findViewById<View>(R.id.btn_command).setOnClickListener { flash(getString(R.string.status_command_soon)) }
+        findViewById<View>(R.id.btn_command).setOnClickListener { showGeminiSettings() }
     }
 
     override fun onStart() {
@@ -234,12 +245,143 @@ class MainActivity : Activity() {
      */
     private fun handleUserText(text: String) {
         setState(State.PROCESSING)
-        val reply = if (langTag == LANG_HI) {
-            getString(R.string.reply_placeholder_hi, text)
-        } else {
-            getString(R.string.reply_placeholder_en, text)
+        val key = getSharedPreferences(PREFS, MODE_PRIVATE)
+            .getString(KEY_GEMINI, null)
+            ?.trim()
+            .orEmpty()
+
+        if (key.isEmpty()) {
+            setState(State.IDLE)
+            showGeminiSettings()
+            return
         }
-        speak(reply)
+
+        aiExecutor.execute {
+            var reply: String? = null
+            var error: String? = null
+            var connection: HttpURLConnection? = null
+            try {
+                val url = URL(
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+                        java.net.URLEncoder.encode(key, "UTF-8")
+                )
+                connection = (url.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "POST"
+                    connectTimeout = 20000
+                    readTimeout = 30000
+                    doOutput = true
+                    setRequestProperty("Content-Type", "application/json; charset=utf-8")
+                }
+
+                val languageInstruction = if (langTag == LANG_HI) {
+                    "Reply in simple Hindi written in Devanagari."
+                } else {
+                    "Reply in simple conversational English."
+                }
+                val body = JSONObject()
+                    .put(
+                        "systemInstruction",
+                        JSONObject().put(
+                            "parts",
+                            JSONArray().put(
+                                JSONObject().put(
+                                    "text",
+                                    "You are JARVIS, a helpful phone voice assistant. " +
+                                        languageInstruction +
+                                        " Keep answers concise and useful. Never claim you performed phone actions unless actually done."
+                                )
+                            )
+                        )
+                    )
+                    .put(
+                        "contents",
+                        JSONArray().put(
+                            JSONObject()
+                                .put("role", "user")
+                                .put("parts", JSONArray().put(JSONObject().put("text", text)))
+                        )
+                    )
+                    .put(
+                        "generationConfig",
+                        JSONObject().put("temperature", 0.7).put("maxOutputTokens", 500)
+                    )
+
+                OutputStreamWriter(connection.outputStream, Charsets.UTF_8).use {
+                    it.write(body.toString())
+                }
+
+                val code = connection.responseCode
+                val stream = if (code in 200..299) connection.inputStream else connection.errorStream
+                val responseText = stream?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }.orEmpty()
+                if (code in 200..299) {
+                    val json = JSONObject(responseText)
+                    reply = json.optJSONArray("candidates")
+                        ?.optJSONObject(0)
+                        ?.optJSONObject("content")
+                        ?.optJSONArray("parts")
+                        ?.let { parts ->
+                            (0 until parts.length()).joinToString(" ") {
+                                parts.optJSONObject(it)?.optString("text").orEmpty()
+                            }.trim()
+                        }
+                        ?.takeIf { it.isNotBlank() }
+                    if (reply == null) error = "Gemini returned no text."
+                } else {
+                    error = "Gemini API error ($code): " +
+                        JSONObject(responseText).optJSONObject("error")?.optString("message")
+                            .orEmpty().ifBlank { "Check your API key and internet connection." }
+                }
+            } catch (e: Exception) {
+                error = e.message ?: "Network error."
+            } finally {
+                connection?.disconnect()
+            }
+
+            runOnUiThread {
+                if (!isFinishing && !isDestroyed) {
+                    if (reply != null) {
+                        speak(reply!!)
+                    } else {
+                        setState(State.IDLE)
+                        flash("AI error: ${error ?: "Unknown error"}")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showGeminiSettings() {
+        val input = EditText(this).apply {
+            hint = "Paste Gemini API key"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            setSingleLine(true)
+            setText(
+                getSharedPreferences(PREFS, MODE_PRIVATE)
+                    .getString(KEY_GEMINI, "")
+            )
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("JARVIS AI Settings")
+            .setMessage("Enter your Gemini API key. It will be stored on this device.")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ ->
+                val key = input.text.toString().trim()
+                if (key.isBlank()) {
+                    flash("API key is empty.")
+                } else {
+                    getSharedPreferences(PREFS, MODE_PRIVATE)
+                        .edit().putString(KEY_GEMINI, key).apply()
+                    flash("Gemini API key saved.")
+                }
+            }
+            .setNeutralButton("Remove key") { _, _ ->
+                getSharedPreferences(PREFS, MODE_PRIVATE)
+                    .edit().remove(KEY_GEMINI).apply()
+                flash("API key removed.")
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     // ---------------------------------------------------------------- TTS
