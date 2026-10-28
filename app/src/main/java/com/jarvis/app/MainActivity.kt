@@ -262,7 +262,7 @@ class MainActivity : Activity() {
             var connection: HttpURLConnection? = null
             try {
                 val url = URL(
-                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" +
                         java.net.URLEncoder.encode(key, "UTF-8")
                 )
                 connection = (url.openConnection() as HttpURLConnection).apply {
