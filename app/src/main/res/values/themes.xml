@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.JARVIS" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/jarvis_background</item>
+        <item name="android:statusBarColor">@color/jarvis_background</item>
+        <item name="android:navigationBarColor">@color/jarvis_background</item>
+    </style>
+</resources>
